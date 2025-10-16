@@ -1,0 +1,15 @@
+services:
+
+  backend:
+    build: ./backend
+    image: backend-inventario:latest
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    image: frontend-inventario:latest
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
