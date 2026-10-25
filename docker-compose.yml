@@ -3,13 +3,15 @@ services:
   backend:
     build: ./backend
     image: backend-inventario:latest
-    ports:
-      - "8000:8000"
+    # Sin "ports": el backend solo es accesible desde la red interna de Compose
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
     image: frontend-inventario:latest
     ports:
-      - "8080:80"
+      - "8080:8080"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

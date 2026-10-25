@@ -1,9 +1,6 @@
 from flask import Flask, jsonify
-from flask_cors import CORS
 
 app = Flask(__name__)
-
-CORS(app)
 
 inventory_items = [
   { "id": 1, "name": 'Laptop', "quantity": 15 },
@@ -20,3 +17,7 @@ inventory_items = [
 @app.route("/api/inventory", methods=['GET'])
 def get_inventory():
   return jsonify(inventory_items)
+
+@app.route("/health", methods=['GET'])
+def health():
+  return jsonify(status="ok")

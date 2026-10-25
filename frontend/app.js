@@ -3,11 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const inventoryList = document.getElementById('inventory-list');
     
-    // Hacemos la petición a nuestra API de Python
-    // Esta URL es la que creamos en nuestro app.py
-    fetch('http://<IP_PÚBLICA_DE_TU_EC2>:8000/api/inventory')
-    //fetch('http://localhost:8000/api/inventory')//
-        .then(response => response.json())
+    // Hacemos la petición a nuestra API de Python.
+    // Nginx redirige /api/ al backend, así que sirve igual en local y en EC2
+    fetch('/api/inventory')
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             // Limpiamos la lista por si había algo antes
             inventoryList.innerHTML = '';
