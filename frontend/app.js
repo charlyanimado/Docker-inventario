@@ -19,6 +19,23 @@ const eliminar   = (id)                 => api(`/${id}`, 'DELETE');
 
 const inventoryList = document.getElementById('inventory-list');
 
+// Botón para crear un producto NUEVO
+const addButton = document.getElementById('add-button');
+addButton.addEventListener('click', async () => {
+    // Pedimos los datos del producto nuevo
+    const name = prompt('Nombre:');
+    if (name === null) return;            // el usuario canceló
+
+    const quantity = Number(prompt('Cantidad:'));
+
+    try {
+        await crear(name, quantity);
+        await cargar();   // refrescamos la pantalla
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
 // Dibuja la lista en pantalla
 function pintarLista(items) {
     // Limpiamos primero, si no los productos se duplican en cada recarga
@@ -35,6 +52,25 @@ function pintarLista(items) {
         itemQuantity.className = 'item-quantity';
         itemQuantity.textContent = `Cantidad: ${item.quantity}`;
 
+        // Botón para actualizar ESTE producto
+        const updateButton = document.createElement('button');
+        updateButton.className = 'btn btn--secondary';
+        updateButton.textContent = 'Actualizar';
+        updateButton.addEventListener('click', async () => {
+            // Pedimos los datos nuevos, con los actuales como valor inicial
+            const name = prompt('Nombre:', item.name);
+            if (name === null) return;            // el usuario canceló
+
+            const quantity = Number(prompt('Cantidad:', item.quantity));
+            
+            try {
+                await actualizar(item.id, name, quantity);
+                await cargar();   // refrescamos la pantalla
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
         // Botón para eliminar ESTE producto
         const deleteButton = document.createElement('button');
         deleteButton.className = 'btn btn--danger';
@@ -48,7 +84,7 @@ function pintarLista(items) {
             }
         });
 
-        listItem.append(itemName, itemQuantity, deleteButton);
+        listItem.append(itemName, itemQuantity, updateButton, deleteButton);
         inventoryList.appendChild(listItem);
     });
 }
