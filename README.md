@@ -15,6 +15,19 @@ Navegador ──► :8080  frontend (Nginx)  ──/api/──►  backend (Flas
 - **Frontend:** Nginx sirve la página y hace de *reverse proxy* hacia la API. El navegador siempre llama a `/api/...`, así que no hay que escribir la IP del servidor en el código ni configurar CORS.
 - **Backend:** API en Flask servida con Gunicorn. No publica ningún puerto: solo el frontend puede llegar a él.
 
+## API
+
+| Método | Ruta | Qué hace | Respuestas |
+|---|---|---|---|
+| `GET` | `/api/inventory` | Lista los productos | `200` |
+| `POST` | `/api/inventory` | Crea un producto | `201`, `400` si faltan datos |
+| `PUT` | `/api/inventory/<id>` | Actualiza nombre y cantidad | `200`, `400`, `404` si no existe |
+| `DELETE` | `/api/inventory/<id>` | Elimina un producto | `200`, `404` si no existe |
+
+Body de `POST` y `PUT`: `{ "name": "Webcam", "quantity": 10 }`
+
+> Los datos viven en memoria: al reiniciar el contenedor vuelven los 10 productos iniciales. Por eso Gunicorn corre con **un solo worker**; con varios, cada proceso tendría su propia copia de la lista.
+
 ## Buenas prácticas aplicadas
 
 | | Backend | Frontend |
@@ -33,6 +46,10 @@ Además, Compose espera a que el backend esté *healthy* antes de levantar el fr
 docker compose up -d --build
 # abrir http://localhost:8080
 docker compose ps        # ambos servicios deben aparecer como (healthy)
+
+curl -X POST localhost:8080/api/inventory \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Webcam", "quantity": 10}'
 docker compose down
 ```
 
